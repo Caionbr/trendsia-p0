@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "triagem"
+version = "0.1.0"
+description = "Triagem de mensagens de clientes com um LLM (projeto P0 do TrendsIA)"
+requires-python = ">=3.12"
+
+[tool.setuptools.packages.find]
+where = ["src"]
