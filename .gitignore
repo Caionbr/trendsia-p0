@@ -1,0 +1,24 @@
+# Configuração local e segredos: NUNCA versionar
+.env
+
+# Ambiente virtual do Python (cada pessoa cria o seu)
+.venv/
+
+# Arquivos gerados automaticamente pelo Python
+__pycache__/
+*.pyc
+
+# Gerados pelo "pip install -e ." (informações da instalação do pacote)
+*.egg-info/
+build/
+
+# Cache do pytest (testes)
+.pytest_cache/
+
+# Experimentos locais que não fazem parte da entrega
+ola_llm.py
+
+# Arquivos do sistema operacional e do editor
+.vscode/
+Thumbs.db
+.DS_Store
