@@ -1,6 +1,5 @@
 # Avaliação do nível Básico: 12 exemplos e casos extras
 
-- **Data:** 16/11/2026
 - **Modelo:** `qwen3.5:9b-q4_K_M` (Ollama 0.40.16), rodando localmente na CPU (Windows, 20 GB de RAM)
 - **Prompt:** versão 1, em `src/triagem/__main__.py` (`PROMPT_SISTEMA`), com `"format": "json"` e `"think": false`
 - **Tempo de resposta (medido em 2 execuções):** 76 s na primeira chamada, que inclui carregar o modelo na memória, e 33 s com o modelo já carregado
