@@ -1,0 +1,11 @@
+# Arquivos que NUNCA devem entrar na imagem Docker
+.env
+.venv/
+.git/
+__pycache__/
+*.pyc
+*.egg-info/
+*.tar
+evidencias/
+docs/
+tests/

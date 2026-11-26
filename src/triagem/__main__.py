@@ -36,14 +36,16 @@ Responda somente com um objeto JSON, sem texto fora dele, neste formato:
 
 
 def carregar_config():
-    """Lê a configuração do arquivo .env e devolve (url, modelo, timeout)."""
+    """Lê a configuração do arquivo .env e devolve (url, modelo, timeout, verificar_ssl)."""
     load_dotenv()
     url = os.getenv("LLM_URL")
     modelo = os.getenv("LLM_MODEL")
     timeout = float(os.getenv("LLM_TIMEOUT", "120"))
+    # A verificação do certificado HTTPS fica ligada, a menos que LLM_VERIFY_SSL=false
+    verificar_ssl = os.getenv("LLM_VERIFY_SSL", "true").strip().lower() != "false"
     if not url or not modelo:
         sys.exit("Erro: defina LLM_URL e LLM_MODEL no arquivo .env (veja o .env.example).")
-    return url.rstrip("/"), modelo, timeout
+    return url.rstrip("/"), modelo, timeout, verificar_ssl
 
 
 def ler_mensagem():
@@ -58,7 +60,7 @@ def ler_mensagem():
     return mensagem
 
 
-def chamar_llm(url, modelo, timeout, mensagem):
+def chamar_llm(url, modelo, timeout, verificar_ssl, mensagem):
     """Envia a mensagem para a API do Ollama e devolve o texto da resposta."""
     corpo = {
         "model": modelo,
@@ -70,7 +72,7 @@ def chamar_llm(url, modelo, timeout, mensagem):
         "format": "json",
         "think": False,
     }
-    resposta = requests.post(f"{url}/api/chat", json=corpo, timeout=timeout)
+    resposta = requests.post(f"{url}/api/chat", json=corpo, timeout=timeout, verify=verificar_ssl)
     resposta.raise_for_status()
     return resposta.json()["message"]["content"]
 
@@ -89,9 +91,9 @@ def mostrar_resultado(resultado):
 
 
 def main():
-    url, modelo, timeout = carregar_config()
+    url, modelo, timeout, verificar_ssl = carregar_config()
     mensagem = ler_mensagem()
-    texto = chamar_llm(url, modelo, timeout, mensagem)
+    texto = chamar_llm(url, modelo, timeout, verificar_ssl, mensagem)
     resultado = interpretar_resposta(texto)
     mostrar_resultado(resultado)
 

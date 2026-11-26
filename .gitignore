@@ -12,6 +12,9 @@ __pycache__/
 *.egg-info/
 build/
 
+# Imagem Docker exportada para a plataforma Devel (arquivo grande, gerado localmente)
+*.tar
+
 # Cache do pytest (testes)
 .pytest_cache/
 
