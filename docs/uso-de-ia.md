@@ -36,7 +36,12 @@ A IA foi usada como **apoio**: explicar conceitos, propor código e documentaç�
 - **Tarefa:** explicar Docker e certificados HTTPS, escrever o `Dockerfile` e o `.dockerignore` e tornar configurável a verificação do certificado (`LLM_VERIFY_SSL`).
 - **Verificação:** teste da imagem com o Ollama local e execução na plataforma ([evidencias/plataforma-devel.md](../evidencias/plataforma-devel.md)).
 
-### 5. Documentação
+### 5. Código do nível Intermediário
+
+- **Tarefa:** separar o código em módulos, tratar os erros com mensagens claras, validar a resposta com pydantic e ajustar o prompt às categorias e urgências definidas pelo autor.
+- **Verificação:** cada erro provocado de propósito ([evidencias/erros-intermediario.md](../evidencias/erros-intermediario.md)) e nova avaliação dos exemplos ([evidencias/avaliacao-intermediario.md](../evidencias/avaliacao-intermediario.md)).
+
+### 6. Documentação
 
 - **Tarefa:** atualizar o README e organizar em tabelas os resultados dos testes feitos pelo autor.
 - **Verificação:** leitura completa pelo autor e conferência dos comandos no Windows.

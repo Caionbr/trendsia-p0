@@ -36,3 +36,21 @@ Ação sugerida: Aguardar envio do número do pedido para localizar a ocorrênci
 - **Classificação:** correta, e igual à da execução local.
 - **Tempo de resposta:** cerca de 102 s entre o envio da requisição e a resposta. Foi a primeira chamada depois de iniciar, então o tempo inclui o carregamento do modelo.
 - O aviso `InsecureRequestWarning` é esperado com `LLM_VERIFY_SSL=false` e foi mantido de propósito, para deixar visível que a verificação está desligada.
+
+## Nível Intermediário na plataforma
+
+A mesma imagem, montada com o código do nível Intermediário e com a mesma configuração do portal. A mensagem usada foi `Tem código de rastreio do meu pedido?`.
+
+| Teste | Configuração alterada | Resultado nos Logs |
+|---|---|---|
+| Funcionamento | nenhuma | `status_pedido` / `media`, resposta cerca de 100 s depois do fim da espera (o LLM ainda estava terminando de ligar) |
+| Certificado | `LLM_VERIFY_SSL=true` | `Erro: Não foi possível verificar o certificado HTTPS do servidor do LLM. Se for um servidor interno com certificado autoassinado, defina LLM_VERIFY_SSL=false.` |
+| Sem espera, LLM já ligado | `ESPERA_LLM=0`, com o LLM disponível | `status_pedido` / `media` em **cerca de 2 s** |
+| Sem espera, LLM desligado | `ESPERA_LLM=0`, com o LLM indisponível | `Erro: O servidor do LLM está com problemas (HTTP 502). Tente novamente em alguns minutos.` |
+| Mensagem vazia | `MENSAGEM=` | `Erro: A mensagem está vazia. Informe o texto do cliente: [...] na plataforma Devel, na variável MENSAGEM.` |
+
+### Constatações
+
+- **Com o LLM ligado, a plataforma responde em cerca de 2 s**, contra 30 a 75 s no computador local sem GPU. Os cerca de 100 s das outras execuções correspondem ao tempo de o LLM ficar pronto.
+- **Enquanto o LLM liga, a plataforma devolve HTTP 502** (Bad Gateway), e não uma falha de conexão. O programa trata esse caso como serviço indisponível. É isso que justifica o `ESPERA_LLM`.
+- Todos os erros aparecem nos Logs como **uma única linha**, sem traceback.
