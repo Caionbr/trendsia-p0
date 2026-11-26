@@ -62,6 +62,8 @@ trendsia-p0/
 ├── requirements.txt      # dependências Python, com versões fixas
 ├── .env.example          # modelo das variáveis de ambiente
 ├── .gitignore            # arquivos que não devem ser versionados (inclui .env e .venv)
+├── Dockerfile            # imagem para rodar na plataforma Devel (LLM institucional)
+├── .dockerignore         # arquivos que nunca entram na imagem (inclui .env)
 ├── src/
 │   └── triagem/
 │       ├── __init__.py
@@ -150,6 +152,7 @@ Os valores do modelo já funcionam com a instalação acima:
 | `LLM_URL` | `http://localhost:11434` | endereço do servidor Ollama |
 | `LLM_MODEL` | `qwen3.5:9b-q4_K_M` | modelo usado. Precisa aparecer em `ollama list` |
 | `LLM_TIMEOUT` | `120` | tempo máximo de espera pela resposta, em segundos |
+| `LLM_VERIFY_SSL` | `true` | verificar o certificado HTTPS do servidor. Use `false` apenas em servidores internos com certificado autoassinado (veja a seção sobre a plataforma Devel). Não tem efeito no Ollama local |
 
 O `.env` é local e está no `.gitignore`, então **nunca vai para o repositório**.
 
@@ -179,6 +182,54 @@ Ação sugerida: Aguardar envio de foto do pacote e peça; analisar caso para or
 O texto do resumo e da ação muda a cada execução. A categoria e a urgência tendem a se manter.
 
 **Tempo de resposta:** num computador sem GPU dedicada, a primeira execução leva cerca de 1 minuto, porque o modelo é carregado na memória. As seguintes levam em torno de 30 segundos.
+
+## Execução na plataforma Devel (LLM institucional)
+
+O programa também roda na plataforma Devel da formação, usando o LLM institucional, que é um servidor Ollama interno com o mesmo modelo `qwen3.5:9b-q4_K_M`. **O código é o mesmo**: só a configuração muda.
+
+Esse LLM só é acessível **de dentro da plataforma**. Por isso o programa é enviado como uma **imagem Docker** e roda num container lá. Como não há terminal interativo, a mensagem vem da variável `MENSAGEM`, e o resultado aparece em **Logs**, no portal.
+
+**Requisito adicional:** [Docker Desktop](https://www.docker.com/products/docker-desktop/), com o motor ("Engine") em execução.
+
+### 1. Montar e testar a imagem
+
+Na pasta do repositório, troque `<seu-id>` pelo identificador exigido pela plataforma, que é o seu e-mail sem caracteres especiais:
+
+```powershell
+docker build -t <seu-id>:latest .
+```
+
+Para testar a imagem antes de enviar, usando o Ollama local (`host.docker.internal` é o endereço do seu computador visto de dentro do container):
+
+```powershell
+docker run --rm -e LLM_URL=http://host.docker.internal:11434 -e LLM_MODEL=qwen3.5:9b-q4_K_M -e LLM_TIMEOUT=300 -e ESPERA_LLM=0 -e MENSAGEM="chegou faltando o braço do boneco" <seu-id>:latest
+```
+
+### 2. Exportar e enviar
+
+```powershell
+docker save --output <seu-id>.tar <seu-id>:latest
+```
+
+No portal, use **Enviar container** com:
+
+- **Porta do container:** `8080`. O portal exige uma porta, mas o programa não escuta nenhuma.
+- **Variáveis de ambiente:**
+  ```
+  LLM_URL=<endereço do LLM interno, informado no guia da plataforma>
+  LLM_MODEL=qwen3.5:9b-q4_K_M
+  LLM_TIMEOUT=300
+  ESPERA_LLM=120
+  LLM_VERIFY_SSL=false
+  MENSAGEM=chegou faltando o braço do boneco
+  ```
+- **Arquivo:** o `<seu-id>.tar` gerado acima.
+
+### 3. Executar
+
+Clique em **Iniciar**, aguarde cerca de 3 minutos e abra **Logs**. O programa classifica a mensagem e o container termina. Para classificar outra mensagem, altere `MENSAGEM` e inicie de novo.
+
+Resultado da execução na plataforma: [evidencias/plataforma-devel.md](evidencias/plataforma-devel.md).
 
 ## Resultados
 
@@ -213,8 +264,7 @@ O projeto é entregue em três níveis. Cada nível é marcado por uma **tag** n
 - **Relatório principal:** [docs/relatorio.md](docs/relatorio.md)
 - **Uso de IA no desenvolvimento:** [docs/uso-de-ia.md](docs/uso-de-ia.md)
 - **Avaliação do nível Básico:** [evidencias/avaliacao-basico.md](evidencias/avaliacao-basico.md)
-o.md)
-- **Uso de IA no desenvolvimento:** [docs/uso-de-ia.md](docs/uso-de-ia.md)
+- **Execução na plataforma Devel:** [evidencias/plataforma-devel.md](evidencias/plataforma-devel.md)
 - **Vídeo de apresentação:** (link a definir)
 
 ## Autor
